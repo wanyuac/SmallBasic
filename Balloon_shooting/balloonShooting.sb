@@ -7,41 +7,51 @@ GraphicsWindow.Height = 480
 GraphicsWindow.Show()
 
 ' Initialise graphic objects
+balloon_x = 40 ' a constant
 balloon_y = 40
-GraphicsWindow.BrushColor = "MediumSeaGreen"
-GraphicsWindow.FillEllipse(40, balloon_y, 40, 40)
-GraphicsWindow.PenColor = "DarkGreen"
-GraphicsWindow.DrawEllipse(40, balloon_y, 40, 40)
-
-gun_y = 420
-GraphicsWindow.BrushColor = "Black"
-GraphicsWindow.FillRectangle(590, gun_y, 40, 30)
-GraphicsWindow.FillRectangle(570, gun_y + 10, 60, 10)
-
+balloon_right = balloon_x + 40
+balloon = Shapes.AddImage(Program.Directory + "\balloon.gif")  ' 40 by 40 pixels
+Shapes.Move(balloon, balloon_x, balloon_y)
+gun_x = 570  ' a constant
+gun_y = 200  ' between 20 and 420
+gun = Shapes.AddImage(Program.Directory + "\gun.gif")  ' 60 by 30 pixels
+Shapes.Move(gun, gun_x, gun_y)
 missed_shots = 0
-GraphicsWindow.BrushColor = "DimGray"
-GraphicsWindow.DrawText(40, 460, "Missed shots: " + missed_shots)
+GraphicsWindow.BrushColor = "Gray"  ' bullet colour
+bullet = Shapes.AddRectangle(10, 10)
+Shapes.HideShape(bullet)
+
+GraphicsWindow.BrushColor = "DimGray" ' text colour
+msg = Shapes.AddText("Missed shots: " + missed_shots)
+Shapes.Move(msg, 40, 460)
 
 '  Play the game
-GraphicsWindow.KeyDown = MoveGun
+While (balloon_right < bullet_x)
+  GraphicsWindow.KeyDown = MoveGun
+EndWhile
 
 Sub MoveGun
   key = GraphicsWindow.LastKey
   gun_y_new = 0
+  
   If key = "Up" Then
     gun_y_new = gun_y - 5
   ElseIf key = "Down" Then
     gun_y_new = gun_y + 5
   ElseIf key = "Space" Then
-    '  pass
+    Shapes.ShowShape(bullet)
+    bullet_x = gun_x - 10
+    bullet_y = gun_y + 10
+    Shapes.Move(bullet, bullet_x, bullet_y)  ' appearance of the bullet
+    
+    missed_shots = missed_shots + 1
+    Shapes.SetText(msg, "Missed shots: " + missed_shots)
+    bullet_x = bullet_x - 20
+    Shapes.Move(bullet, bullet_x, bullet_y)
   EndIf
   
   If gun_y_new <> 0 Then
-    GraphicsWindow.BrushColor = "White"
-    GraphicsWindow.FillRectangle(570, gun_y, 60, 30)  '  erase the previous gun
-    GraphicsWindow.BrushColor = "Black"
-    GraphicsWindow.FillRectangle(590, gun_y_new, 40, 30)
-    GraphicsWindow.FillRectangle(570, gun_y_new + 10, 60, 10)
+    Shapes.Move(gun, gun_x, gun_y_new)
     gun_y = gun_y_new
   EndIf
 EndSub
