@@ -1,0 +1,47 @@
+'  Yu Wan, 2 Feb 2019
+
+'  Initialise a graphic window
+GraphicsWindow.Title = "Balloon Shooting"
+GraphicsWindow.Width = 640
+GraphicsWindow.Height = 480
+GraphicsWindow.Show()
+
+' Initialise graphic objects
+balloon_y = 40
+GraphicsWindow.BrushColor = "MediumSeaGreen"
+GraphicsWindow.FillEllipse(40, balloon_y, 40, 40)
+GraphicsWindow.PenColor = "DarkGreen"
+GraphicsWindow.DrawEllipse(40, balloon_y, 40, 40)
+
+gun_y = 420
+GraphicsWindow.BrushColor = "Black"
+GraphicsWindow.FillRectangle(590, gun_y, 40, 30)
+GraphicsWindow.FillRectangle(570, gun_y + 10, 60, 10)
+
+missed_shots = 0
+GraphicsWindow.BrushColor = "DimGray"
+GraphicsWindow.DrawText(40, 460, "Missed shots: " + missed_shots)
+
+'  Play the game
+GraphicsWindow.KeyDown = MoveGun
+
+Sub MoveGun
+  key = GraphicsWindow.LastKey
+  gun_y_new = 0
+  If key = "Up" Then
+    gun_y_new = gun_y - 5
+  ElseIf key = "Down" Then
+    gun_y_new = gun_y + 5
+  ElseIf key = "Space" Then
+    '  pass
+  EndIf
+  
+  If gun_y_new <> 0 Then
+    GraphicsWindow.BrushColor = "White"
+    GraphicsWindow.FillRectangle(570, gun_y, 60, 30)  '  erase the previous gun
+    GraphicsWindow.BrushColor = "Black"
+    GraphicsWindow.FillRectangle(590, gun_y_new, 40, 30)
+    GraphicsWindow.FillRectangle(570, gun_y_new + 10, 60, 10)
+    gun_y = gun_y_new
+  EndIf
+EndSub
