@@ -1,53 +1,111 @@
-'  Yu Wan, 2 Feb 2019
+'  Yu Wan, 2 - 4 Feb 2019
 
 '  Initialise a graphic window
 GraphicsWindow.Title = "Balloon Shooting"
-GraphicsWindow.Width = 640
-GraphicsWindow.Height = 480
+GraphicsWindow.Width = 640  ' canvas X coordinates: 20 .. 620
+GraphicsWindow.Height = 480  ' canvas Y coordinates: 20 .. 420
 GraphicsWindow.Show()
 
 ' Initialise graphic objects
-balloon_x = 40 ' a constant
-balloon_y = 40
-balloon_right = balloon_x + 40
-balloon = Shapes.AddImage(Program.Directory + "\balloon.gif")  ' 40 by 40 pixels
+balloon_x = 20 ' a constant
+balloon_y = 20
+balloon_right = balloon_x + 40  ' a constant as well
+balloon = Shapes.AddImage(Program.Directory + "\balloon.gif")  ' 42 by 42 pixels
 Shapes.Move(balloon, balloon_x, balloon_y)
+reach_dest = "True"  ' whether the balloon reaches its destination on the Y axis
+
+gun = Shapes.AddImage(Program.Directory + "\gun.gif")  ' 60 by 30 pixels
 gun_x = 570  ' a constant
 gun_y = 200  ' between 20 and 420
-gun = Shapes.AddImage(Program.Directory + "\gun.gif")  ' 60 by 30 pixels
 Shapes.Move(gun, gun_x, gun_y)
-missed_shots = 0
+
 GraphicsWindow.BrushColor = "Gray"  ' bullet colour
 bullet = Shapes.AddRectangle(10, 10)
-Shapes.HideShape(bullet)
+shot = "False"  ' whether a bullet is shot (that is, shown)
+Shapes.HideShape(bullet)  ' so hide the bullet
+bullet_x = gun_x - 10
+bullet_y = gun_y + 10
 
+missed_shots = 0
+hit = "False"  ' a logical variable determining if the bullet hits the balloon
 GraphicsWindow.BrushColor = "DimGray" ' text colour
 msg = Shapes.AddText("Missed shots: " + missed_shots)
-Shapes.Move(msg, 40, 460)
+Shapes.Move(msg, 40, 460)  ' initialise the message box
 
-'  Play the game
-While (balloon_right < bullet_x)
-  GraphicsWindow.KeyDown = MoveGun
+GraphicsWindow.KeyDown = MoveGun
+
+'  Play the game: iterate through frames
+' balloon_right < bullet_x
+While (hit = "False")
+  ' Create a floating balloon (diameter = 40), whose Y fluctuates between 20 and 580
+  If reach_dest = "True" Then  ' Obtain a new destination to float to
+    dest_y = Math.GetRandomNumber(401) + 19  ' dest_y = 20 .. 420:  where the balloon will move to
+    If dest_y > balloon_y Then
+      balloon_step = 1  ' float downwards
+    ElseIf dest_y < balloon_y Then
+      balloon_step = -1  ' float upwards
+    Else
+      balloon_step = 0
+    EndIf
+    reach_dest = "False"
+  Else
+    balloon_y = balloon_y + balloon_step
+    Shapes.Move(balloon, balloon_x, balloon_y)
+    If balloon_y = dest_y Then
+      reach_dest = "True"
+    Else
+      reach_dest = "False"
+    EndIf
+  EndIf
+  
+  ' Move the bullet when it is shown
+  If shot = "True" Then
+    bullet_x = bullet_x - 1.5  ' move to the left
+    Shapes.Move(bullet, bullet_x, bullet_y)  ' Let the bullet fly 1.5 times the speed of the balloon.
+    
+    ' Determine whether the bullet hits the balloon or not
+    If (bullet_x <= balloon_right) And (bullet_y >= balloon_y) And (bullet_y <= (balloon_y + 42)) Then
+      hit = "True"  ' exit this while loop
+      Shapes.HideShape(bullet)
+    ElseIf bullet_x <= 20 Then
+      missed_shots = missed_shots + 1
+      Shapes.SetText(msg, "Missed shots: " + missed_shots)
+      Shapes.HideShape(bullet)
+      hit = "False"
+      shot = "False"
+    EndIf
+  EndIf
+    
+  Program.Delay(10) ' 100 frames per second
 EndWhile
+
+' Drop the balloon when it is shot
+While (balloon_y < 420)
+  balloon_y = balloon_y + 2  ' move the balloon downwards
+  Shapes.Move(balloon, balloon_x, balloon_y)
+  Program.Delay(10)
+EndWhile
+
+' Show the final message
+Shapes.HideShape(balloon)
+GraphicsWindow.ShowMessage("Congratulations, you hit the balloon!", "Success")
 
 Sub MoveGun
   key = GraphicsWindow.LastKey
   gun_y_new = 0
   
   If key = "Up" Then
-    gun_y_new = gun_y - 5
+    gun_y_new = gun_y - 1
   ElseIf key = "Down" Then
-    gun_y_new = gun_y + 5
+    gun_y_new = gun_y + 1
   ElseIf key = "Space" Then
-    Shapes.ShowShape(bullet)
-    bullet_x = gun_x - 10
-    bullet_y = gun_y + 10
-    Shapes.Move(bullet, bullet_x, bullet_y)  ' appearance of the bullet
-    
-    missed_shots = missed_shots + 1
-    Shapes.SetText(msg, "Missed shots: " + missed_shots)
-    bullet_x = bullet_x - 20
-    Shapes.Move(bullet, bullet_x, bullet_y)
+    If shot = "False" Then  ' ensure only a single bullet is shown each time
+      shot = "True"
+      Shapes.ShowShape(bullet)
+      bullet_x = gun_x - 10
+      bullet_y = gun_y + 10
+      Shapes.Move(bullet, bullet_x, bullet_y)  ' appearance of the bullet
+    EndIf
   EndIf
   
   If gun_y_new <> 0 Then
