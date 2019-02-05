@@ -1,6 +1,6 @@
-'  Yu Wan, 2 - 4 Feb 2019
+' Yu Wan, 2 - 4 Feb 2019
 
-'  Initialise a graphic window
+' Initialise a graphic window
 GraphicsWindow.Title = "Balloon Shooting"
 GraphicsWindow.Width = 640  ' canvas X coordinates: 20 .. 620
 GraphicsWindow.Height = 480  ' canvas Y coordinates: 20 .. 420
@@ -34,7 +34,7 @@ Shapes.Move(msg, 40, 460)  ' initialise the message box
 
 GraphicsWindow.KeyDown = MoveGun
 
-'  Play the game: iterate through frames
+' Play the game: iterate through frames
 ' balloon_right < bullet_x
 While (hit = "False")
   ' Create a floating balloon (diameter = 40), whose Y fluctuates between 20 and 580
