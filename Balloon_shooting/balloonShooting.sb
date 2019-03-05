@@ -32,7 +32,7 @@ GraphicsWindow.BrushColor = "DimGray" ' text colour
 msg = Shapes.AddText("Missed shots: " + missed_shots)
 Shapes.Move(msg, 40, 460)  ' initialise the message box
 
-GraphicsWindow.KeyDown = MoveGun
+GraphicsWindow.KeyDown = MoveGun  ' an action that is independent of the while loop and changes variables when it happens (This is how it affects the while loop)
 
 ' Play the game: iterate through frames
 ' balloon_right < bullet_x
